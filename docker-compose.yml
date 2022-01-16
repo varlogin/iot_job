@@ -1,0 +1,23 @@
+services:
+  api:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --reload
+    volumes:
+      - ./src:/app
+      - ./data:/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+  backend:
+    build: .
+    command: rq worker -c settings --with-scheduler
+    volumes:
+      - ./src:/app
+      - ./data:/data
+    depends_on:
+      - redis
+  redis:
+    image: redis:6.2
+    ports:
+      - "6379:6379"
